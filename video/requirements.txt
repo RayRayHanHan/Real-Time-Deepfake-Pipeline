@@ -12,3 +12,6 @@ tensorflow;
 torch==2.0.1+cu118; sys_platform != 'darwin'
 torch==2.0.1; sys_platform == 'darwin'
 tqdm==4.66.4
+pyzmq==26.2.1
+msgpack==1.1.0
+msgpack-numpy==0.4.8
