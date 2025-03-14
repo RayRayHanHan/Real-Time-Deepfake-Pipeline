@@ -9,13 +9,15 @@ import time
 
 m.patch()
 
-ZMQ_RECEIVE_ADDRESS = "tcp://0.0.0.0:5555"
-ZMQ_SEND_ADDRESS = "tcp://0.0.0.0:5556"
+ZMQ_RECEIVE_ADDRESS = "tcp://0.0.0.0:8888"
+ZMQ_SEND_ADDRESS = "tcp://0.0.0.0:8889"
 
 
 # Process received webcam frame
 def process_frame(frame, wrapper):
-    processed_frame = wrapper.generate(frame)
+    # Resize frame
+    frame_resized = cv2.resize(frame, (1280, 720), interpolation=cv2.INTER_AREA)
+    processed_frame = wrapper.generate(frame_resized)
     return processed_frame
 
 
@@ -43,10 +45,17 @@ def main():
             start_time = time.time()
             data = receiver.recv()
             compressed_frame = np.frombuffer(msgpack.unpackb(data), dtype=np.uint8)
-            frame = cv2.imdecode(compressed_frame, cv2.IMREAD_COLOR)
+            frame = cv2.imdecode(compressed_frame, cv2.IMREAD_REDUCED_COLOR_2)
 
             # Process frame
             processed_frame = process_frame(frame, wrapper)
+
+            # Resize back to original resolution if needed (before sending)
+            processed_frame = cv2.resize(
+                processed_frame,
+                (frame.shape[1], frame.shape[0]),
+                interpolation=cv2.INTER_CUBIC,
+            )
 
             # Compress and send processed frame
             _, encoded_frame = cv2.imencode(
