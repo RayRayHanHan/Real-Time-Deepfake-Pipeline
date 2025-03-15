@@ -12,9 +12,8 @@ import cv2
 import zmq
 import msgpack
 import msgpack_numpy as m
-import pyvirtualcam  # Add pyvirtualcam library for virtual camera output
+import pyvirtualcam
 
-# Patch msgpack for numpy support
 m.patch()
 
 # Server configuration
@@ -224,7 +223,6 @@ def update_target_on_server():
 
 
 # Video functionality
-# Video functionality
 def initialize_video():
     global zmq_context, sender, receiver, cap, virtual_cam
 
@@ -233,14 +231,14 @@ def initialize_video():
 
     # Socket to send frames to the server with minimal buffering
     sender = zmq_context.socket(zmq.PUSH)
-    sender.setsockopt(zmq.SNDHWM, 1)  # Only buffer 1 message
-    sender.setsockopt(zmq.LINGER, 0)  # Don't wait when closing
+    sender.setsockopt(zmq.SNDHWM, 1)
+    sender.setsockopt(zmq.LINGER, 0)
     sender.connect(ZMQ_SERVER_ADDRESS)
 
     # Socket to receive processed frames from the server
     receiver = zmq_context.socket(zmq.PULL)
-    receiver.setsockopt(zmq.RCVHWM, 1)  # Only buffer 1 message
-    receiver.setsockopt(zmq.LINGER, 0)  # Don't wait when closing
+    receiver.setsockopt(zmq.RCVHWM, 1)
+    receiver.setsockopt(zmq.LINGER, 0)
     receiver.connect(ZMQ_CLIENT_ADDRESS)
 
     # Initialize webcam
@@ -309,14 +307,11 @@ def frame_receiver():
     try:
         while video_running:
             try:
-                # Receive processed frame from the server
                 data = receiver.recv()
 
-                # Process the received frame
                 processed_frame_data = np.frombuffer(msgpack.unpackb(data), dtype=np.uint8)
                 processed_frame = cv2.imdecode(processed_frame_data, cv2.IMREAD_COLOR)
 
-                # Add to buffer
                 if len(frame_buffer) >= 3:  # Keep max 3 frames in buffer
                     frame_buffer.pop(0)
                 frame_buffer.append(processed_frame)
@@ -359,7 +354,6 @@ def process_video():
 
     try:
         while video_running:
-            # Always flush the camera buffer to get the latest frame
             for _ in range(5):  # Clear buffer by reading frames
                 cap.read()
 
@@ -372,9 +366,7 @@ def process_video():
 
             current_time = time.time()
 
-            # Only send a new frame if we've received the previous response or after timeout
             if (frames_sent <= frames_received) or (current_time - last_frame_time > 1.0):
-                # Clear any pending messages in the sender queue
                 try:
                     # Non-blocking check for messages to discard
                     while receiver.poll(timeout=0):
@@ -407,7 +399,6 @@ def process_video():
                 # No frame available yet
                 pass
 
-            # Slow down the loop to prevent CPU overload
             time.sleep(0.05)
 
     except Exception as e:
@@ -422,7 +413,6 @@ def process_video():
 def cleanup_video():
     global cap, zmq_context, sender, receiver, virtual_cam
 
-    # Discard any pending messages to avoid delay on next start
     if receiver is not None:
         try:
             while receiver.poll(timeout=0):
@@ -493,7 +483,6 @@ def connect_ssh_for_video():
                                   stderr=subprocess.PIPE,
                                   creationflags=subprocess.CREATE_NO_WINDOW)
 
-        # Don't wait for it to complete as it runs in background
         ssh_video_status_label.config(text="Connected to Video Server")
     except Exception as e:
         ssh_video_status_label.config(text="Connection Failed")
@@ -503,7 +492,7 @@ def connect_ssh_for_video():
 # GUI Setup
 root = tk.Tk()
 root.title("Deepfake Audio & Video Client")
-root.geometry("800x600")  # Smaller size since we don't need the video display
+root.geometry("800x600")
 
 try:
     record_icon = tk.PhotoImage(file="record_icon.png")
@@ -612,12 +601,11 @@ def update_vcam_status():
     """Update the virtual camera status periodically"""
     status = "Virtual Camera: Active" if virtual_cam is not None and video_running else "Virtual Camera: Not active"
     vcam_status_label.config(text=status)
-    root.after(1000, update_vcam_status)  # Update every second
+    root.after(1000, update_vcam_status)
 
 # Start the status update
 update_vcam_status()
 
-# Keyboard shortcuts
 root.bind("<x>", toggle_recording)
 root.bind("<X>", toggle_recording)
 root.bind("<v>", lambda event: toggle_video())
@@ -629,7 +617,6 @@ root.rowconfigure(0, weight=1)
 
 root.mainloop()
 
-# Cleanup
 if recording_flag:
     stop_recording()
 if video_running:
