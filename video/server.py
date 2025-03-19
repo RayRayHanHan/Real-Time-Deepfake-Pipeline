@@ -9,8 +9,8 @@ import time
 
 m.patch()
 
-ZMQ_RECEIVE_ADDRESS = "tcp://0.0.0.0:8888"
-ZMQ_SEND_ADDRESS = "tcp://0.0.0.0:8889"
+ZMQ_RECEIVE_ADDRESS = "tcp://0.0.0.0:5558"
+ZMQ_SEND_ADDRESS = "tcp://0.0.0.0:5559"
 
 
 # Process received webcam frame
