@@ -7,8 +7,8 @@ import time
 
 m.patch()
 
-ZMQ_SERVER_ADDRESS = "tcp://localhost:5555"
-ZMQ_CLIENT_ADDRESS = "tcp://localhost:5556"
+ZMQ_SERVER_ADDRESS = "tcp://localhost:5558"
+ZMQ_CLIENT_ADDRESS = "tcp://localhost:5559"
 
 
 def main():

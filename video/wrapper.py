@@ -10,7 +10,7 @@ import time
 import os
 
 torch.cuda.empty_cache()
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 
 # Wrapper class for face detection & analysis (via InsightFace), face swapping (inswapper_128.onnx model from InsightFace) and face enhancement (via GFPGAN)
@@ -20,7 +20,7 @@ class Wrapper:
     def __init__(
         self,
         source_path,
-        gfpgan_path="models/GFPGANv1.4.pth",
+        gfpgan_path="models/GFPGANv1.3.pth",
         inswapper_path="models/inswapper_128_fp16.onnx",
     ):
         # Load face analyzer model (InsightFace, buffalo_l)
@@ -33,9 +33,7 @@ class Wrapper:
             ],
             provider_options=[{"device_id": 0}],
         )
-        self.face_analyzer.prepare(
-            ctx_id=0, det_size=(640, 640), det_thresh=0.5
-        )  # change to 640, 360?
+        self.face_analyzer.prepare(ctx_id=0, det_size=(640, 640), det_thresh=0.5)
 
         # Load face swapping model (InsightFace, inswapper)
         self.face_swapper = insightface.model_zoo.get_model(
