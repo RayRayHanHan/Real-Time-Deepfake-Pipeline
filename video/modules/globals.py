@@ -28,7 +28,11 @@ video_quality = None
 live_mirror = False
 live_resizable = True
 max_memory = None
-execution_providers = ['CUDAExecutionProvider']
+execution_providers = [
+    "CUDAExecutionProvider",
+    "CoreMLExecutionProvider",
+    "CPUExecutionProvider",
+]
 execution_threads = None
 headless = None
 log_level = "error"

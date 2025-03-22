@@ -1,4 +1,4 @@
 The models are too large, so they can't be pushed into the GitHub repo. Just download the models below and move them into this directory.
 
 1. https://huggingface.co/hacksider/deep-live-cam/resolve/main/inswapper_128_fp16.onnx?download=true
-2. https://github.com/TencentARC/GFPGAN/releases/download/v1.3.4/GFPGANv1.4.pth
+2. https://github.com/TencentARC/GFPGAN/releases/download/v1.3.4/GFPGANv1.4.pth, https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth
