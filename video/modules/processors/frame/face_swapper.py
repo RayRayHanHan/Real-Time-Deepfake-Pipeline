@@ -16,6 +16,7 @@ from modules.utilities import (
 from modules.cluster_analysis import find_closest_centroid
 import os
 
+INSWAPPER_PATH = ""
 FACE_SWAPPER = None
 THREAD_LOCK = threading.Lock()
 NAME = "DLC.FACE-SWAPPER"
@@ -59,7 +60,10 @@ def get_face_swapper() -> Any:
 
     with THREAD_LOCK:
         if FACE_SWAPPER is None:
-            model_path = os.path.join(models_dir, "inswapper_128_fp16.onnx")
+            if not os.path.isabs(INSWAPPER_PATH):
+                model_path = os.path.join(models_dir, os.path.basename(INSWAPPER_PATH))
+            else:
+                model_path = INSWAPPER_PATH
             FACE_SWAPPER = insightface.model_zoo.get_model(
                 model_path, providers=modules.globals.execution_providers
             )

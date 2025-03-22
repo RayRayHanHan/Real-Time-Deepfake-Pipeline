@@ -5,6 +5,7 @@ import msgpack_numpy as m
 import numpy as np
 from wrapper import Wrapper
 import time
+import argparse
 
 
 m.patch()
@@ -22,10 +23,44 @@ def process_frame(frame, wrapper):
 
 
 def main():
+    # Set up command line argument parsing
+    parser = argparse.ArgumentParser(
+        description="Real-Time-Deepfake-Pipeline Server Options"
+    )
+    parser.add_argument(
+        "--source_image",  # Replace with file path of source image
+        type=str,
+        default="./image.jpg",
+        help="Path to the source image.",
+    )
+    parser.add_argument(
+        "--gfpgan_path",
+        type=str,
+        default="models/GFPGANv1.3.pth",
+        help="Path to the GFPGAN model file.",
+    )
+    parser.add_argument(
+        "--inswapper_path",
+        type=str,
+        default="models/inswapper_128_fp16.onnx",
+        help="Path to the inswapper model file.",
+    )
+    parser.add_argument(
+        "--upscale",
+        type=float,
+        default=0.4,
+        help="Upscale factor for GFPGAN face enhancement.",
+    )
+    args = parser.parse_args()
+
     # Initialize wrapper
-    source_path = "./image.jpg"  # Replace with file path of source image
     print("Initializing wrapper...")
-    wrapper = Wrapper(source_path)
+    wrapper = Wrapper(
+        source_image=args.source_image,
+        gfpgan_path=args.gfpgan_path,
+        inswapper_path=args.inswapper_path,
+        upscale=args.upscale,
+    )
 
     context = zmq.Context()
 
