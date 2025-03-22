@@ -19,9 +19,10 @@ class Wrapper:
     # Initialize models
     def __init__(
         self,
-        source_path,
+        source_image="./image.jpg",
         gfpgan_path="models/GFPGANv1.3.pth",
         inswapper_path="models/inswapper_128_fp16.onnx",
+        upscale=0.4,
     ):
         # Load face analyzer model (InsightFace, buffalo_l)
         self.face_analyzer = FaceAnalysis(
@@ -31,7 +32,7 @@ class Wrapper:
                 "CoreMLExecutionProvider",
                 "CPUExecutionProvider",
             ],
-            provider_options=[{"device_id": 0}],
+            provider_options=[{"device_id": 0}, {"device_id": 0}, {"device_id": 0}],
         )
         self.face_analyzer.prepare(ctx_id=0, det_size=(640, 640), det_thresh=0.5)
 
@@ -43,17 +44,17 @@ class Wrapper:
                 "CoreMLExecutionProvider",
                 "CPUExecutionProvider",
             ],
-            provider_options=[{"device_id": 0}],
+            provider_options=[{"device_id": 0}, {"device_id": 0}, {"device_id": 0}],
         )
+        face_swapper.INSWAPPER_PATH = inswapper_path
 
         # Load GFPGAN model for face enhancement
         self.face_enhancer = self.load_model(gfpgan_path)
-
-        # Path to source face image for face-swap
-        self.source_path = source_path
+        face_enhancer.FACE_ENHANCER_UPSCALE = upscale
+        face_enhancer.GFPGAN_PATH = gfpgan_path
 
         # Source face: Load and extract the face from the source image
-        self.source_face = face_analyser.get_one_face(cv2.imread(self.source_path))
+        self.source_face = face_analyser.get_one_face(cv2.imread(source_image))
 
     # Load a model
     def load_model(self, path):

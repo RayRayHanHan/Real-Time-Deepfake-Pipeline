@@ -17,7 +17,9 @@ from modules.utilities import (
     is_video,
 )
 
+GFPGAN_PATH = ""
 FACE_ENHANCER = None
+FACE_ENHANCER_UPSCALE = 0.4
 THREAD_SEMAPHORE = threading.Semaphore()
 THREAD_LOCK = threading.Lock()
 NAME = "DLC.FACE-ENHANCER"
@@ -49,21 +51,24 @@ def pre_start() -> bool:
 
 
 def get_face_enhancer() -> Any:
-    global FACE_ENHANCER
+    global FACE_ENHANCER, FACE_ENHANCER_UPSCALE, GFPGAN_PATH
 
     with THREAD_LOCK:
         if FACE_ENHANCER is None:
-            model_path = os.path.join(models_dir, "GFPGANv1.3.pth")
+            if not os.path.isabs(GFPGAN_PATH):
+                model_path = os.path.join(models_dir, os.path.basename(GFPGAN_PATH))
+            else:
+                model_path = GFPGAN_PATH
 
             match platform.system():
                 case "Darwin":  # Mac OS
                     if torch.backends.mps.is_available():
                         mps_device = torch.device("mps")
-                        FACE_ENHANCER = gfpgan.GFPGANer(model_path=model_path, upscale=0.4, device=mps_device)  # type: ignore[attr-defined]
+                        FACE_ENHANCER = gfpgan.GFPGANer(model_path=model_path, upscale=FACE_ENHANCER_UPSCALE, device=mps_device)  # type: ignore[attr-defined]
                     else:
-                        FACE_ENHANCER = gfpgan.GFPGANer(model_path=model_path, upscale=0.4)  # type: ignore[attr-defined]
+                        FACE_ENHANCER = gfpgan.GFPGANer(model_path=model_path, upscale=FACE_ENHANCER_UPSCALE)  # type: ignore[attr-defined]
                 case _:  # Other OS
-                    FACE_ENHANCER = gfpgan.GFPGANer(model_path=model_path, upscale=0.4)  # type: ignore[attr-defined]
+                    FACE_ENHANCER = gfpgan.GFPGANer(model_path=model_path, upscale=FACE_ENHANCER_UPSCALE)  # type: ignore[attr-defined]
 
     return FACE_ENHANCER
 
