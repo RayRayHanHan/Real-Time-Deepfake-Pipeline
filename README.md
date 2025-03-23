@@ -56,7 +56,7 @@ This repository provides a complete real-time deepfake system for both voice and
 
 ### Installation
 
-1. **Clone Deep-Live-Cam Repository & Install Dependencies:**
+1. **Clone Real-Time-Deepfake-Pipeline Repository & Install Dependencies:**
    ```bash
    git clone https://github.com/ali-shariaty/Real-Time-Deepfake-Pipeline.git
    cd Real-Time-Deepfake-Pipeline/video
