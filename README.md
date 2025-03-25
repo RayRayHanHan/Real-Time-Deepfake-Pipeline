@@ -1,5 +1,12 @@
 # Real-Time Deepfake Voice & Video Conversion
 
+## Goal
+
+- Use state-of-the-art audio and video deepfake models and build a real-time pipeline for a live video call.
+- Focus on choosing efficient models that ensure high-quality, low-latency performance for both audio and video deepfakes during live interactions.
+- Create a pipeline to automate the process, with a user interface (UI) that integrates with video calling platforms such as Skype or other alternatives to facilitate real-time deepfake interaction.
+
+
 This repository provides a complete real-time deepfake system for both voice and video conversion. It consists of a **server-client architecture** where:
 
 - **Audio System:**  
@@ -96,8 +103,8 @@ This project has been tested using an **SSH server**.
 - Start both **audio and video servers**.
 - Run the **client scripts** to send data to the servers.
 - Use **VB-Audio** for real-time voice conversion in Skype or other platforms.
-- Use **OBS Virtual Camera** for real-time video deepfake.
-
+- Use **OBS Virtual Camera** to route real-time deepfake video into your video calling software.
+- Enjoy seamless deepfake interaction during live video calls.
 ---
 
 ## License 📝
