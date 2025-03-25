@@ -11,6 +11,7 @@ import os
 
 torch.cuda.empty_cache()
 
+
 class Wrapper:
     def __init__(
         self,
@@ -18,6 +19,7 @@ class Wrapper:
         gfpgan_path="models/GFPGANv1.3.pth",
         inswapper_path="models/inswapper_128_fp16.onnx",
         upscale=0.4,
+        disable_face_enhancement=False,
     ):
         self.face_analyzer = FaceAnalysis(
             name="buffalo_l",
@@ -41,9 +43,11 @@ class Wrapper:
         )
         face_swapper.INSWAPPER_PATH = inswapper_path
 
-        self.face_enhancer = self.load_model(gfpgan_path)
-        face_enhancer.FACE_ENHANCER_UPSCALE = upscale
-        face_enhancer.GFPGAN_PATH = gfpgan_path
+        self.disable_face_enhancement = disable_face_enhancement
+        if not self.disable_face_enhancement:
+            self.face_enhancer = self.load_model(gfpgan_path)
+            face_enhancer.FACE_ENHANCER_UPSCALE = upscale
+            face_enhancer.GFPGAN_PATH = gfpgan_path
 
         self.source_face = face_analyser.get_one_face(cv2.imread(source_image))
 
@@ -68,7 +72,7 @@ class Wrapper:
             print("Source face updated.")
         else:
             print("Error: Unable to load new image.")
-        
+
         face_enhancer.FACE_ENHANCER_UPSCALE = new_upscale
         print(f"Upscale factor updated to {new_upscale}")
 
@@ -86,10 +90,14 @@ class Wrapper:
         elapsed_time = time.time() - start_time
         print(f"2. Face swapper: {elapsed_time:.4f} seconds")
 
-        start_time = time.time()
-        processed_frame = face_enhancer.process_frame(None, tmp_frame)
-        elapsed_time = time.time() - start_time
-        print(f"3. Face enhancer: {elapsed_time:.4f} seconds")
+        print(self.disable_face_enhancement)
+        if not self.disable_face_enhancement:
+            start_time = time.time()
+            processed_frame = face_enhancer.process_frame(None, tmp_frame)
+            elapsed_time = time.time() - start_time
+            print(f"3. Face enhancer: {elapsed_time:.4f} seconds")
+        else:
+            processed_frame = tmp_frame
 
         if isinstance(processed_frame, Image.Image):
             processed_frame = np.array(processed_frame)
