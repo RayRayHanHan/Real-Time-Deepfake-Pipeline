@@ -42,12 +42,12 @@ This repository provides a complete real-time deepfake system for both voice and
 
 3. **Start the Audio Server:**
    ```bash
-   python server.py
+   python inference.py
    ```
 
 4. **Run the Audio Client** (for real-time voice conversion):
    ```bash
-   python client.py
+   python GUI-Client.py
    ```
    
    The client has a **GUI**, allowing you to select a different **source audio** for conversion.
@@ -75,7 +75,7 @@ This repository provides a complete real-time deepfake system for both voice and
 
 4. **Run the Video Client:**
    ```bash
-   python client.py
+   python GUI-Client.py
    ```
    
    The client also has a **GUI**, allowing you to select a different **source image** for face-swapping.
