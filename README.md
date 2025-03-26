@@ -80,12 +80,14 @@ This repository provides a complete real-time deepfake system for both voice and
    python server.py
    ```
 
+   With ```--help``` you can see the available options which can be modified for the video server. The options **source image**, **upscale factor** and **disable face enhancement toggle** can also be modified at runtime via the GUI-Client.
+
 4. **Run the Video Client:**
    ```bash
    python GUI-Client.py
    ```
    
-   The client also has a **GUI**, allowing you to select a different **source image** for face-swapping.
+   The client also has a **GUI**, allowing you to select a different **source image** for face-swapping, different **upscale factor** for face enhancing or **disabling** (or enabling) the **face enhancement**.
 
 5. **Set Up Virtual Camera in OBS**
    - Open **OBS Studio** and go to `Settings > Video`.
