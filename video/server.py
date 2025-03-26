@@ -88,11 +88,17 @@ def main():
                     update_data = json.loads(message.decode("utf-8"))
                     new_image_path = update_data.get("source_image")
                     new_upscale = update_data.get("upscale")
-                    if new_image_path and new_upscale is not None:
+                    new_disable_face = update_data.get("disable_face_enhancement")
+                    if new_image_path and new_upscale and new_disable_face is not None:
                         print("Received update command:")
                         print(f" - New source image: {new_image_path}")
                         print(f" - New upscale factor: {new_upscale}")
-                        wrapper.update_config(new_image_path, float(new_upscale))
+                        print(
+                            f" - New disable face enhancement value: {new_disable_face}"
+                        )
+                        wrapper.update_config(
+                            new_image_path, float(new_upscale), new_disable_face
+                        )
                         update_socket.send_string("Update successful")
                     else:
                         update_socket.send_string("Invalid update command")

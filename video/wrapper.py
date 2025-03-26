@@ -64,7 +64,7 @@ class Wrapper:
         model = torch.load(path, map_location=device)
         return model
 
-    def update_config(self, new_image_path, new_upscale):
+    def update_config(self, new_image_path, new_upscale, new_disable_face):
         print("Updating configuration...")
         new_image = cv2.imread(new_image_path)
         if new_image is not None:
@@ -75,6 +75,8 @@ class Wrapper:
 
         face_enhancer.FACE_ENHANCER_UPSCALE = new_upscale
         print(f"Upscale factor updated to {new_upscale}")
+        self.disable_face_enhancement = new_disable_face
+        print(f"Disable face enhancement value updated to {new_disable_face}")
 
     def generate(self, frame):
         start_time = time.time()
