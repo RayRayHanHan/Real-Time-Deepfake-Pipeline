@@ -90,23 +90,74 @@ This repository provides a complete real-time deepfake system for both voice and
    The client also has a **GUI**, allowing you to select a different **source image** for face-swapping, different **upscale factor** for face enhancing or **disabling** (or enabling) the **face enhancement**.
 
 5. **Set Up Virtual Camera in OBS**
-   - Open **OBS Studio** and go to `Settings > Video`.
-   - Add a **Virtual Camera**.
+   - Open **OBS Studio**.
+   - Add your webcam as a source by going to `Sources -> Video Capture Device` and selecting your webcam.
+   - Click Start Virtual Camera in the `Controls` panel.
+   - Close **OBS Studio** after starting the virtual camera. This is necessary to avoid conflicts, as the webcam might otherwise be occupied by OBS when your program is running.
+   
+   This will allow OBS’s virtual camera to be used by the client later.
 
 ---
 
 ## SSH Server Compatibility 🔧
-This project has been tested using an **SSH server**.
 
+If you want to run the server and client on different devices (e.g. a remote SSH server for the server side and your local machine for the client), follow these steps:
+
+1. **Install and Configure the Server:**  
+   Ensure that all server components (both audio and video) are installed and configured on your SSH server.
+
+2. **Set Up SSH Port Forwarding:**  
+   Open separate terminal windows for port forwarding:
+
+   - **For Video:**  
+     ```bash
+     ssh -L 5558:localhost:5558 -L 5559:localhost:5559 -L 5560:localhost:5560 -p <SSH_PORT> <USERNAME>@<IP>
+     ```
+   - **For Audio:**  
+     ```bash
+     ssh -L 5003:localhost:5003 -p <SSH_PORT> <USERNAME>@<IP>
+     ```
+
+   Adjust the port numbers, username, and IP address as needed.
+
+3. **Start the Servers on the SSH Server:**  
+   - In the video terminal, run:
+     ```bash
+     python server.py
+     ```
+   - In the audio terminal, run:
+     ```bash
+     python inference.py
+     ```
+
+4. **Run the Client Locally:**  
+   Open a new terminal on your local device and execute:
+   ```bash
+   python GUI-Client.py
+   ```
+
+The client will connect to the forwarded ports and communicate with the servers on the SSH server.
+
+Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local machine. All other files must be installed and run on the server.
 
 ---
 
 ## Usage 🛠️
-- Start both **audio and video servers**.
+- Start both **audio and video servers** (locally or on an SSH server with port forwarding as described).
 - Run the **client scripts** to send data to the servers.
 - Use **VB-Audio** for real-time voice conversion in Skype or other platforms.
 - Use **OBS Virtual Camera** to route real-time deepfake video into your video calling software.
 - Enjoy seamless deepfake interaction during live video calls.
+---
+
+## Credits & Contributors 🤝
+
+This project was created and is maintained by **Ali Shariaty** and **Mert Arslan**.  
+Feel free to reach out via email:
+
+- alishariaty0854@gmail.com 
+- mert.arslan517@gmail.com
+
 ---
 
 ## License 📝
