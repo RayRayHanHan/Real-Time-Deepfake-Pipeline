@@ -92,7 +92,6 @@ class Wrapper:
         elapsed_time = time.time() - start_time
         print(f"2. Face swapper: {elapsed_time:.4f} seconds")
 
-        print(self.disable_face_enhancement)
         if not self.disable_face_enhancement:
             start_time = time.time()
             processed_frame = face_enhancer.process_frame(None, tmp_frame)
