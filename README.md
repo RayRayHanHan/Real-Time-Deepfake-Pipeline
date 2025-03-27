@@ -152,7 +152,34 @@ If you want to run the server and client on different devices (e.g. a remote SSH
      python server.py
      ```
 
-4. **Run the Client Locally:**  
+4. **GUI File Upload Functions**
+
+For functions such as **upload_target_audio** and **upload_video_source**:
+- **Private Key Path (if required):**  
+  If your SSH server uses key-based authentication, replace the placeholder (e.g., `your private Key for SSH`) with the path to your actual private key.
+- **SSH Port:**  
+  Replace the placeholder port value with your actual SSH port.
+- **Remote Destination:**  
+  Update the remote path to include the proper username and target directory on your SSH server.
+
+5. **Server Connection Command**
+
+For the function that establishes an SSH connection (e.g., **connect_ssh_for_video**):
+- **SSH Credentials:**  
+  Modify the SSH command to use your own private key (if required), port, username, and IP address.
+- **Server Path:**  
+  Ensure that the command navigates to the correct directory on your SSH server. Replace any example usernames (like “ali”) with your actual SSH user ID.
+
+6. **Additional Configurations**
+
+If you need to adjust parameters such as target image, chunk size, or other settings in the GUI:
+- **Function Parameters:**  
+  Make sure the functions handling these parameters are updated with your SSH credentials (port, username, IP) and any necessary file paths or configuration values.
+- **Modular Approach:**  
+  It is recommended to centralize these settings so they can be easily changed across the application.
+
+
+7. **Run the Client Locally:**  
    Open a new terminal on your local device and execute:
    ```bash
    python GUI-Client.py
