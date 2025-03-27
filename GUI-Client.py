@@ -19,6 +19,7 @@ m.patch()
 SERVER_URL = "http://127.0.0.1:8080/convert"
 UPDATE_URL = "http://127.0.0.1:8080/update_target"
 HEALTH_URL = "http://127.0.0.1:8080/health"
+SWITCH_VOCODER_URL = 'http://127.0.0.1:8080/switch_vocoder'
 ZMQ_SERVER_ADDRESS = "tcp://localhost:5558"
 ZMQ_CLIENT_ADDRESS = "tcp://localhost:5559"
 ZMQ_UPDATE_ADDRESS = "tcp://localhost:5560"
@@ -93,13 +94,64 @@ def send_to_server(audio_data):
         print(f"Error connecting to server: {e}")
 
 
+def smooth_audio_transition(prev_chunk, current_chunk, overlap_ratio=0.15):
+    if prev_chunk is None:
+        return current_chunk
+
+    overlap_samples = int(len(current_chunk) * overlap_ratio)
+    fade_curve = np.linspace(1, 0, overlap_samples)
+
+    blended_chunk = np.zeros_like(current_chunk)
+    blended_chunk[:overlap_samples] = prev_chunk[-overlap_samples:] * (1 - fade_curve) + \
+                                      current_chunk[:overlap_samples] * fade_curve
+    blended_chunk[overlap_samples:] = current_chunk[overlap_samples:]
+
+    return blended_chunk
+
+
+def play_audio_with_smoothing(data, buffer_size=3072, overlap_ratio=0.15):
+    try:
+        stream = audio.open(
+            format=audio_format,
+            channels=channels,
+            rate=rate,
+            output=True,
+            frames_per_buffer=buffer_size
+        )
+
+        prev_chunk = None
+
+        for i in range(0, len(data), buffer_size):
+            current_chunk = data[i:i + buffer_size]
+
+            if len(current_chunk) < buffer_size:
+                current_chunk = np.pad(current_chunk, (0, buffer_size - len(current_chunk)), 'constant')
+
+            if prev_chunk is not None:
+                current_chunk = smooth_audio_transition(prev_chunk, current_chunk, overlap_ratio)
+
+            stream.write(current_chunk.astype(np.float32).tobytes())
+
+            prev_chunk = current_chunk
+            time.sleep(0.005)
+
+        stream.stop_stream()
+        stream.close()
+
+    except Exception as e:
+        print(f"Error Advanced Audio Playback: {e}")
+
+
 def play_audio(data):
-    print("Starting audio playback...")
-    stream = audio.open(format=audio_format, channels=channels, rate=rate, output=True)
-    stream.write(data.astype(np.float32).tobytes())
-    stream.stop_stream()
-    stream.close()
-    print("Audio playback finished.")
+    play_audio_with_smoothing(data)
+
+# def play_audio(data):
+#     print("Starting audio playback...")
+#     stream = audio.open(format=audio_format, channels=channels, rate=rate, output=True)
+#     stream.write(data.astype(np.float32).tobytes())
+#     stream.stop_stream()
+#     stream.close()
+#     print("Audio playback finished.")
 
 
 def record_audio():
@@ -233,6 +285,24 @@ def update_target_on_server():
     except Exception as e:
         update_status_label.config(text="Update Failed")
         print(f"Error updating target on server: {e}")
+
+def switch_vocoder():
+    selected_vocoder = vocoder_combobox.get().lower()
+    try:
+        response = requests.post(SWITCH_VOCODER_URL,
+                                 json={'vocoder_type': selected_vocoder},
+                                 headers={'Content-Type': 'application/json'})
+
+        if response.status_code == 200:
+            result = response.json()
+            vocoder_status_label.config(text=f"Switched to {selected_vocoder.upper()} Vocoder")
+            print(f"Vocoder switched: {result}")
+        else:
+            vocoder_status_label.config(text="Switch Failed")
+            print(f"Failed to switch vocoder: {response.text}")
+    except Exception as e:
+        vocoder_status_label.config(text="Connection Error")
+        print(f"Error switching vocoder: {e}")
 
 
 # Video functions
@@ -494,7 +564,7 @@ def send_update_config(server_path, new_upscale, disable_face):
 # GUI
 root = tk.Tk()
 root.title("Deepfake Audio & Video Client")
-root.geometry("900x800")
+root.geometry("900x900")
 
 mainframe = ttk.Frame(root, padding="10")
 mainframe.grid(column=0, row=0, sticky="NSEW")
@@ -541,8 +611,8 @@ chunk_label.grid(column=1, row=1, padx=5, pady=5, sticky="W")
 chunk_var = tk.StringVar(value=str(chunk))
 chunk_spinbox = ttk.Spinbox(
     audio_frame,
-    from_=8000,
-    to=32000,
+    from_=1000,
+    to=64000,
     increment=1000,
     textvariable=chunk_var,
     command=update_chunk_size,
@@ -650,6 +720,20 @@ video_update_button.grid(column=0, row=4, padx=5, pady=5, sticky="EW")
 
 video_update_status_label = ttk.Label(video_source_frame, text="")
 video_update_status_label.grid(column=1, row=4, padx=5, pady=5, sticky="EW")
+
+vocoder_label = ttk.Label(audio_frame, text="Vocoder Type:")
+vocoder_label.grid(column=0, row=2, padx=5, pady=5, sticky="W")
+
+vocoder_combobox = ttk.Combobox(audio_frame, values=["BigVGAN", "HiFiGAN"], state="readonly")
+vocoder_combobox.current(0)  # default to BigVGAN
+vocoder_combobox.grid(column=1, row=2, padx=5, pady=5, sticky="EW")
+
+vocoder_switch_button = ttk.Button(audio_frame, text="Switch Vocoder", command=switch_vocoder)
+vocoder_switch_button.grid(column=0, row=3, columnspan=2, padx=5, pady=5, sticky="EW")
+
+vocoder_status_label = ttk.Label(audio_frame, text="")
+vocoder_status_label.grid(column=0, row=4, columnspan=2, padx=5, pady=5, sticky="EW")
+
 
 root.bind("<x>", toggle_recording)
 root.bind("<X>", toggle_recording)
