@@ -2,26 +2,35 @@
 
 ## Goal
 
-- Use state-of-the-art audio and video deepfake models and build a real-time pipeline for a live video call.
-- Focus on choosing efficient models that ensure high-quality, low-latency performance for both audio and video deepfakes during live interactions.
-- Create a pipeline to automate the process, with an user interface (UI) that integrates with video calling platforms such as Skype or other alternatives to facilitate real-time deepfake interaction.
+This project aims to provide **real-time deepfake** capabilities for both **voice** and **video** in applications such as **Skype**, **Zoom**, and other video calling platforms. Using state-of-the-art audio and video deepfake models, this project builds a complete real-time pipeline that converts your voice and face on the fly. The system is designed with high-quality, low-latency performance in mind to ensure a seamless live interaction experience.
 
+---
+
+## Overview
 
 This repository provides a complete real-time deepfake system for both voice and video conversion. It consists of a **server-client architecture** where:
 
-- **Audio System:**  
-  - The **client** captures your microphone input, sends it to the server for real-time conversion, and plays the modified voice during live calls (e.g., Skype, VB-Audio).
-  - The **server** performs voice conversion using **Diff-HierVC**.
-  
-- **Video System:**  
-  - The **client** captures webcam video, sends frames to the server, and returns modified frames to an OBS virtual camera for real-time deepfake video applications.
-  - The **server** performs face detection and face swapping using **insightface** and perofrms face enhancing using **GFPGAN**.
+- **Audio Server (Diff-HierVC):**  
+  Runs a Flask-based service to perform real-time voice conversion.  
+- **Video Server (insightface + GFPGAN):**  
+  Processes webcam frames to perform face detection, swapping, and optional enhancement.
+
+**A single GUI client** manages **both** audio and video connections. From this GUI, you can:
+- **Connect/Disconnect** to the audio server.
+- **Connect/Disconnect** to the video server.
+- **Push-to-Talk** or continuous audio streaming for real-time voice conversion.
+- **Configure** audio chunk size, select vocoder (BigVGAN or HiFiGAN), and upload/update target voice references.
+- **Upload** and **update** the source image for face swapping on the video server.
+- **Start/Stop** the virtual camera stream for real-time face swapping.
+- **Adjust** upscale factors and face enhancement settings.
+
+Below is a screenshot of the **single GUI** client:
 
 > **Note:** The pre-trained models are too large for GitHub. Download them manually using the links below and place them into the specified directories.
 
 ---
 
-## Audio System 🎤
+## Audio Server Ssetup 🎤
 
 ### Setup
 
@@ -40,7 +49,7 @@ This repository provides a complete real-time deepfake system for both voice and
    ├── ckpt
    │   ├── config.json
    │   └── model_diffhier.pth ✅
-   ├── inference.py
+   ├── server.py
    ├── infer.sh
    ├── vocoder
    │   ├── voc_hifigan.pth ✅
@@ -49,23 +58,24 @@ This repository provides a complete real-time deepfake system for both voice and
 
 3. **Start the Audio Server:**
    ```bash
-   python inference.py
+   python server.py
    ```
+   By default, the server listens on port **5003**.
 
-4. **Run the Audio Client** (for real-time voice conversion):
-   ```bash
-   python GUI-Client.py
-   ```
-   
-   The client has a **GUI**, allowing you to select a different **source audio** for conversion.
+4. **VB-Audio Virtual Cable**  
+   - Install [VB-CABLE](https://vb-audio.com/Cable/index.htm).  
+   - In **Windows Sound Settings**, set **`CABLE Output`** as the default microphone.  
+   - In the calling app (Skype/Zoom), select **`CABLE Output`** as the microphone.  
+   - The GUI client will play converted audio to your default output device, which VB-CABLE routes into the calling app.
 
-## Video System 🎥
+---
+
+## Video Server Setup 🎥
 
 ### Setup
 
-1. **Clone Real-Time-Deepfake-Pipeline Repository & Install Dependencies:**
+1. **Install Dependencies:**
    ```bash
-   git clone https://github.com/ali-shariaty/Real-Time-Deepfake-Pipeline.git
    cd Real-Time-Deepfake-Pipeline/video
    pip install -r requirements.txt
    ```
@@ -82,20 +92,32 @@ This repository provides a complete real-time deepfake system for both voice and
 
    With ```--help``` you can see the available options which can be modified for the video server. The options **source image**, **upscale factor** and **disable face enhancement toggle** can also be modified at runtime via the GUI-Client.
 
-4. **Run the Video Client:**
-   ```bash
-   python GUI-Client.py
-   ```
-   
-   The client also has a **GUI**, allowing you to select a different **source image** for face-swapping, different **upscale factor** for face enhancing or **disabling** (or enabling) the **face enhancement**.
 
-5. **Set Up Virtual Camera in OBS**
+4. **Set Up Virtual Camera in OBS**
    - Open **OBS Studio**.
    - Add your webcam as a source by going to `Sources -> Video Capture Device` and selecting your webcam.
    - Click Start Virtual Camera in the `Controls` panel.
    - Close **OBS Studio** after starting the virtual camera. This is necessary to avoid conflicts, as the webcam might otherwise be occupied by OBS when your program is running.
    
    This will allow OBS’s virtual camera to be used by the client later.
+
+---
+
+
+## Running the Single GUI Client
+
+After both servers are running (locally or remotely), **navigate to the root directory** of the project and run:
+
+```bash
+python GUI-Client.py
+```
+
+The GUI includes:
+- **Server Connection** section to connect to Audio/Video servers.
+- **Audio Controls** to choose your audio device, push-to-talk, chunk size, vocoder type, etc.
+- **Target Audio Upload** to select and upload new reference audio for voice conversion.
+- **Video Controls** to start/stop video streaming, configure the source image for face swapping, and upscale factors.
+- **Virtual Camera Status** to indicate whether the OBS virtual camera is active.
 
 ---
 
@@ -127,7 +149,7 @@ If you want to run the server and client on different devices (e.g. a remote SSH
      ```
    - In the audio terminal, run:
      ```bash
-     python inference.py
+     python server.py
      ```
 
 4. **Run the Client Locally:**  
@@ -142,12 +164,63 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
 
 ---
 
-## Usage 🛠️
-- Start both **audio and video servers** (locally or on an SSH server with port forwarding as described).
-- Run the **client scripts** to send data to the servers.
-- Use **VB-Audio** for real-time voice conversion in Skype or other platforms.
-- Use **OBS Virtual Camera** to route real-time deepfake video into your video calling software.
-- Enjoy seamless deepfake interaction during live video calls.
+## Usage Workflow 🛠️
+
+1. **Server Side**  
+   - Launch the audio server (`server.py` in `audio/`).  
+   - Launch the video server (`server.py` in `video/`).
+
+2. **Client Side**  
+   - Run `GUI-Client.py` from the project root.  
+   - Configure the **Audio Server** and **Video Server** addresses (local or remote via SSH forwarding).  
+   - In the GUI, adjust audio device, chunk size, vocoder, etc.  
+   - For video, upload or select a source image, set the upscale factor, and start the video stream.
+
+3. **Virtual Devices**  
+   - **VB-CABLE** for audio input.  
+   - **OBS Virtual Camera** for video output.
+
+4. **Join a Call**  
+   - In Skype/Zoom, select **`CABLE Output`** as your microphone.  
+   - In Skype/Zoom, select **`OBS Virtual Camera`** as your webcam.  
+   - Experience real-time deepfake voice and video.
+
+---
+
+## Recommended Settings
+
+1. **Chunk Size (Audio)**  
+   - Default: `16000` samples.  
+   - Decreasing chunk size (e.g., `8000` or `4000`) **reduces latency** but may lower audio quality.  
+   - Increasing chunk size **improves audio quality** but adds more delay.  
+   - This project also uses **audio smoothing** to reduce audible artifacts between chunks. See:
+     ```python
+     def smooth_audio_transition(prev_chunk, current_chunk, overlap_ratio=0.15): ...
+     def play_audio_with_smoothing(data, buffer_size=3072, overlap_ratio=0.15): ...
+     ```
+     - **`buffer_size`** (e.g., `3072`) determines how many samples are processed at a time during playback.
+     - **`overlap_ratio`** (e.g., `0.15`) controls how much of the chunk overlaps with the previous chunk.  
+       - A **larger overlap_ratio** can provide smoother transitions (fewer artifacts), but requires more compute and can introduce slight additional delay.
+       - A **smaller overlap_ratio** is faster but may cause more abrupt transitions between chunks.
+
+2. **Vocoder**  
+   - **BigVGAN**: Higher audio quality, slightly slower inference.  
+   - **HiFiGAN**: Faster inference, slightly lower fidelity.
+
+3. **Diffusion Steps (Audio)**  
+   In the code, you may see:
+   ```python
+   def get_adaptive_diff_params(audio_length):
+       return 15, 15
+   ```
+   which returns two parameters: `diffpitch_ts` and `diffvoice_ts`.  
+   - **`diffpitch_ts`**: Number of diffusion steps specifically for pitch. Higher values can lead to smoother pitch transformations but increase compute time.  
+   - **`diffvoice_ts`**: Number of diffusion steps for the voice timbre. Higher values can yield more accurate timbre changes, at the cost of extra latency.
+
+4. **Upscale Factor (Video)**  
+   - Default: `0.4`.  
+   - Higher values may produce sharper faces (when GFPGAN enhancement is enabled) but increase computation time.
+
 ---
 
 ## Credits & Contributors 🤝
@@ -163,20 +236,6 @@ Feel free to reach out via email:
 ## License 📝
 This project is licensed under the **MIT License**.
 
-```
-MIT License
-
-Copyright (c) 2025 Ali & Mert
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-[...] (Full MIT License Text)
-```
 
 ---
 
