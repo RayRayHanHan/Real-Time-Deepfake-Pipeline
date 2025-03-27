@@ -4,18 +4,18 @@
 
 - Use state-of-the-art audio and video deepfake models and build a real-time pipeline for a live video call.
 - Focus on choosing efficient models that ensure high-quality, low-latency performance for both audio and video deepfakes during live interactions.
-- Create a pipeline to automate the process, with a user interface (UI) that integrates with video calling platforms such as Skype or other alternatives to facilitate real-time deepfake interaction.
+- Create a pipeline to automate the process, with an user interface (UI) that integrates with video calling platforms such as Skype or other alternatives to facilitate real-time deepfake interaction.
 
 
 This repository provides a complete real-time deepfake system for both voice and video conversion. It consists of a **server-client architecture** where:
 
 - **Audio System:**  
-  - The **server** performs voice conversion using **Diff-HierVC**.
   - The **client** captures your microphone input, sends it to the server for real-time conversion, and plays the modified voice during live calls (e.g., Skype, VB-Audio).
+  - The **server** performs voice conversion using **Diff-HierVC**.
   
 - **Video System:**  
-  - The **server** performs face swapping using **Deep-Live-Cam**.
   - The **client** captures webcam video, sends frames to the server, and returns modified frames to an OBS virtual camera for real-time deepfake video applications.
+  - The **server** performs face detection and face swapping using **insightface** and perofrms face enhancing using **GFPGAN**.
 
 > **Note:** The pre-trained models are too large for GitHub. Download them manually using the links below and place them into the specified directories.
 
@@ -23,7 +23,7 @@ This repository provides a complete real-time deepfake system for both voice and
 
 ## Audio System 🎤
 
-### Installation
+### Setup
 
 1. **Clone the Repository & Install Dependencies:**
    ```bash
@@ -61,7 +61,7 @@ This repository provides a complete real-time deepfake system for both voice and
 
 ## Video System 🎥
 
-### Installation
+### Setup
 
 1. **Clone Real-Time-Deepfake-Pipeline Repository & Install Dependencies:**
    ```bash
@@ -72,7 +72,7 @@ This repository provides a complete real-time deepfake system for both voice and
 
 2. **Download Pre-trained Models and Place Them in the Correct Directory:**
    - [Face Swapping Model](https://huggingface.co/hacksider/deep-live-cam/resolve/main/inswapper_128_fp16.onnx?download=true)
-   - [GFPGAN Model](https://github.com/TencentARC/GFPGAN/releases/download/v1.3.4/GFPGANv1.4.pth)
+   - [GFPGAN Model v1.3](https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth) or/and [GFPGAN Model v1.4](https://github.com/TencentARC/GFPGAN/releases/download/v1.3.4/GFPGANv1.4.pth)
    - Move them into `Real-Time-Deepfake-Pipeline/video/models/`
 
 3. **Start the Video Server:**
@@ -143,7 +143,7 @@ If you use this work, please cite the following paper:
 ```
 
 ## Acknowledgements 💎
-- This project is based on **[Diff-HierVC](https://github.com/hayeong0/Diff-HierVC)**, **[HiFiGAN](https://github.com/jik876/hifi-gan)**, **[BigVGAN](https://github.com/NVIDIA/BigVGAN)**, and **[Deep-Live-Cam](https://github.com/hacksider/Deep-Live-Cam)**.
+- This project is based on **[Diff-HierVC](https://github.com/hayeong0/Diff-HierVC)**, **[HiFiGAN](https://github.com/jik876/hifi-gan)**, **[BigVGAN](https://github.com/NVIDIA/BigVGAN)**, **[Deep-Live-Cam](https://github.com/hacksider/Deep-Live-Cam)**, **[insightface](https://github.com/deepinsight/insightface)** and **[GFPGAN](https://github.com/TencentARC/GFPGAN)**.
 
 ---
 
