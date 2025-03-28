@@ -35,6 +35,16 @@ Below is a screenshot of the **single GUI** client:
 
 ---
 
+## System Requirements
+
+- **Python Version:** Developed and tested on **Python 3.10.16**.
+- **Platform Compatibility:**
+  - Fully functional on **Windows**.
+  - **macOS** is supported to some extent; however, the GUI client (which relies on `pyvirtualcam`) does not automatically create a virtual camera on newer macOS devices (M1/M2). See the `Future Improvements` section for more details.
+- Dependencies are listed in the respective `requirements.txt` files for the audio and video components.
+
+---
+
 ## Audio Server Setup 🎤
 
 ### Setup
@@ -148,11 +158,11 @@ If you want to run the server and client on different devices (e.g. a remote SSH
    Adjust the port numbers, username, and IP address as needed.
 
 3. **Start the Servers on the SSH Server:**  
-   - In the video terminal, run:
+   - In the video terminal, navigate to the `video/` directory and run the video server:
      ```bash
      python server.py
      ```
-   - In the audio terminal, run:
+   - In the audio terminal, navigate to the `audio/` directory and run the audio server:
      ```bash
      python server.py
      ```
@@ -192,7 +202,7 @@ If you need to adjust parameters such as source image, chunk size, or other sett
 
 The client will connect to the forwarded ports and communicate with the servers on the SSH server.
 
-Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local machine. All other files must be installed and run on the server.
+> **Note:** Only the client (e.g. GUI-Client.py) needs to be executed on your local machine. All other files must be installed and run on the server.
 
 ---
 
@@ -286,10 +296,10 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
 4. **Face Swapping Models (InsightFace – inswapper)**  
    - **inswapper_128_fp16.onnx** (default):  
      - Faster inference using half-precision (FP16), slightly worse precision
-     - Faster and less memory-intensive
+     - Less memory-intensive
    - **inswapper_128.onnx** (FP32):  
      - Higher precision, slightly better results  
-     - Slower and more memory-intensive  
+     - Slower inference and more memory-intensive  
    - **Recommendation**: Stick with the FP16 model unless you're targeting maximum quality and latency isn't a concern.
 
 ---
@@ -308,6 +318,9 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
 - **Model Enhancements:**  
   - Integrate and test the new [inswapper-512-live](https://github.com/deepinsight/inswapper-512-live) model, which was announced on March 2, 2025 in the Top News section of [insightface](https://github.com/deepinsight/insightface?tab=readme-ov-file#top-news).
   - Evaluate and incorporate additional models for both face swapping and face enhancement to further improve quality or speed.
+  - **Address Occlusion Limitations:**  
+    - Tackle current limitations where the face swapper struggles with obstacles (e.g., objects partially occluding the face).
+    - Investigate alternative models or enhancements that can better handle occlusions.
   - Benchmark overall inference time for the entire pipeline and optimize where possible.
 
 - **General Performance Improvements:**  
@@ -349,8 +362,10 @@ This project is licensed under the **MIT License**.
 ---
 
 ## Citation 🎓
-If you use this work, please cite the following paper:
-```
+If you use this work in your research, please consider citing the following key papers:
+
+### Deepfake Voice Conversion (Diff-HierVC)
+```bibtex
 @inproceedings{choi23d_interspeech,
   author={Ha-Yeong Choi and Sang-Hoon Lee and Seong-Whan Lee},
   title={{Diff-HierVC: Diffusion-based Hierarchical Voice Conversion with Robust Pitch Generation and Masked Prior for Zero-shot Speaker Adaptation}},
@@ -360,6 +375,34 @@ If you use this work, please cite the following paper:
   doi={10.21437/Interspeech.2023-817}
 }
 ```
+
+### Face Restoration (GFPGAN)
+```bibtex
+@InProceedings{wang2021gfpgan,
+    author = {Xintao Wang and Yu Li and Honglun Zhang and Ying Shan},
+    title = {Towards Real-World Blind Face Restoration with Generative Facial Prior},
+    booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year = {2021}
+}
+```
+
+### Face Recognition and Swapping (InsightFace)
+```bibtex
+@inproceedings{ren2023pbidr,
+  title={Facial Geometric Detail Recovery via Implicit Representation},
+  author={Ren, Xingyu and Lattas, Alexandros and Gecer, Baris and Deng, Jiankang and Ma, Chao and Yang, Xiaokang},
+  booktitle={2023 IEEE 17th International Conference on Automatic Face and Gesture Recognition (FG)},  
+  year={2023}
+ }
+
+@article{guo2021sample,
+  title={Sample and Computation Redistribution for Efficient Face Detection},
+  author={Guo, Jia and Deng, Jiankang and Lattas, Alexandros and Zafeiriou, Stefanos},
+  journal={arXiv preprint arXiv:2105.04714},
+  year={2021}
+}
+```
+For a comprehensive list of InsightFace citations, please refer to the InsightFace repository's [citation section](https://github.com/deepinsight/insightface?tab=readme-ov-file#citation).
 
 ## Acknowledgements 💎
 - This project is based on **[Diff-HierVC](https://github.com/hayeong0/Diff-HierVC)**, **[HiFiGAN](https://github.com/jik876/hifi-gan)**, **[BigVGAN](https://github.com/NVIDIA/BigVGAN)**, **[Deep-Live-Cam](https://github.com/hacksider/Deep-Live-Cam)**, **[insightface](https://github.com/deepinsight/insightface)** and **[GFPGAN](https://github.com/TencentARC/GFPGAN)**.
