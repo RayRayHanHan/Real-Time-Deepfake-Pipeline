@@ -97,7 +97,7 @@ def play_audio_with_smoothing(data, buffer_size=3072, overlap_ratio=0.15):
         stream = audio.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=buffer_size)
         prev_chunk = None
         for i in range(0, len(data), buffer_size):
-            current_chunk = data[i : i + buffer_size]
+            current_chunk = data[i:i + buffer_size]
             if len(current_chunk) < buffer_size:
                 current_chunk = np.pad(current_chunk, (0, buffer_size - len(current_chunk)), "constant")
             if prev_chunk is not None:
@@ -521,8 +521,10 @@ update_button = ttk.Button(target_frame, text="Update Audio Target on Server", c
 update_button.grid(column=0, row=2, padx=5, pady=5, sticky="EW")
 update_status_label = ttk.Label(target_frame, text="")
 update_status_label.grid(column=1, row=2, padx=5, pady=5, sticky="EW")
-audio_target_display_label = ttk.Label(target_frame, text="No audio selected", anchor="e")
-audio_target_display_label.grid(column=2, row=0, padx=5, pady=5, sticky="EW")
+target_audio_title_label = ttk.Label(target_frame, text="Target Audio:", font=("Arial", 10))
+target_audio_title_label.grid(column=2, row=0, padx=5, pady=5, sticky="W")
+audio_target_display_label = ttk.Label(target_frame, text="No audio selected", anchor="w", font=("Arial", 11))
+audio_target_display_label.grid(column=2, row=1, padx=5, pady=5, sticky="EW")
 target_frame.columnconfigure(2, weight=1)
 
 video_frame = ttk.LabelFrame(mainframe, text="Video Controls", padding="10")
@@ -536,12 +538,10 @@ vcam_status_frame = ttk.LabelFrame(mainframe, text="Virtual Camera Status", padd
 vcam_status_frame.grid(column=0, row=5, columnspan=2, padx=5, pady=5, sticky="EW")
 vcam_status_label = ttk.Label(vcam_status_frame, text="Virtual Camera: Not active")
 vcam_status_label.grid(column=0, row=0, padx=5, pady=5, sticky="W")
-
 def update_vcam_status():
     status = "Virtual Camera: Active" if virtual_cam is not None and video_running else "Virtual Camera: Not active"
     vcam_status_label.config(text=status)
     root.after(1000, update_vcam_status)
-
 update_vcam_status()
 
 video_source_frame = ttk.LabelFrame(mainframe, text="Video Source Update", padding="10")
@@ -566,8 +566,10 @@ video_update_button = ttk.Button(video_source_frame, text="Update Video Config o
 video_update_button.grid(column=0, row=4, padx=5, pady=5, sticky="EW")
 video_update_status_label = ttk.Label(video_source_frame, text="")
 video_update_status_label.grid(column=1, row=4, padx=5, pady=5, sticky="EW")
-video_target_preview_label = ttk.Label(video_source_frame, text="No preview", anchor="e")
-video_target_preview_label.grid(column=2, row=0, padx=5, pady=5, sticky="EW")
+target_image_title_label = ttk.Label(video_source_frame, text="Target Image:", font=("Arial", 10))
+target_image_title_label.grid(column=2, row=0, padx=5, pady=5, sticky="W")
+video_target_preview_label = ttk.Label(video_source_frame, text="No preview", anchor="e", font=("Arial", 11))
+video_target_preview_label.grid(column=2, row=1, padx=5, pady=5, sticky="EW")
 video_source_frame.columnconfigure(2, weight=1)
 
 def browse_target_audio_with_update():
@@ -597,7 +599,6 @@ root.bind("<x>", toggle_recording)
 root.bind("<X>", toggle_recording)
 root.bind("<v>", toggle_video)
 root.bind("<V>", toggle_video)
-
 root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
 root.mainloop()
