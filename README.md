@@ -22,7 +22,8 @@ This repository provides a complete real-time deepfake system for both voice and
 - **Configure** audio chunk size, select vocoder (BigVGAN or HiFiGAN), and upload/update target voice references.
 - **Upload** and **update** the source image for face swapping on the video server.
 - **Start/Stop** the virtual camera stream for real-time face swapping.
-- **Adjust** upscale factors and face enhancement settings.
+- **Adjust** upscale factor for face enhancement.
+- **Disable/enable** face enhancement.
 
 Below is a screenshot of the **single GUI** client:
 
@@ -33,7 +34,7 @@ Below is a screenshot of the **single GUI** client:
 
 ---
 
-## Audio Server Ssetup 🎤
+## Audio Server Setup 🎤
 
 ### Setup
 
@@ -119,7 +120,7 @@ The GUI includes:
 - **Server Connection** section to connect to Audio/Video servers.
 - **Audio Controls** to choose your audio device, push-to-talk, chunk size, vocoder type, etc.
 - **Target Audio Upload** to select and upload new reference audio for voice conversion.
-- **Video Controls** to start/stop video streaming, configure the source image for face swapping, and upscale factors.
+- **Video Controls** to start/stop video streaming, configure the source image for face swapping, and upscale factor for face enhancement.
 - **Virtual Camera Status** to indicate whether the OBS virtual camera is active.
 
 ---
@@ -175,7 +176,7 @@ For the function that establishes an SSH connection (e.g., **connect_ssh_for_vid
 
 6. **Additional Configurations**
 
-If you need to adjust parameters such as target image, chunk size, or other settings in the GUI:
+If you need to adjust parameters such as source image, chunk size, or other settings in the GUI:
 - **Function Parameters:**  
   Make sure the functions handling these parameters are updated with your SSH credentials (port, username, IP) and any necessary file paths or configuration values.
 - **Modular Approach:**  
@@ -219,7 +220,9 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
 
 ## Recommended Settings
 
-1. **Chunk Size (Audio)**  
+### Audio
+
+1. **Chunk Size**  
    - Default: `16000` samples.  
    - Decreasing chunk size (e.g., `8000` or `4000`) **reduces latency** but may lower audio quality.  
    - Increasing chunk size **improves audio quality** but adds more delay.  
@@ -237,7 +240,7 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
    - **BigVGAN**: Higher audio quality, slightly slower inference.  
    - **HiFiGAN**: Faster inference, slightly lower fidelity.
 
-3. **Diffusion Steps (Audio)**  
+3. **Diffusion Steps**  
    In the code, you may see:
    ```python
    def get_adaptive_diff_params(audio_length):
@@ -247,9 +250,47 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
    - **`diffpitch_ts`**: Number of diffusion steps specifically for pitch. Higher values can lead to smoother pitch transformations but increase compute time.  
    - **`diffvoice_ts`**: Number of diffusion steps for the voice timbre. Higher values can yield more accurate timbre changes, at the cost of extra latency.
 
-4. **Upscale Factor (Video)**  
-   - Default: `0.4`.  
-   - Higher values may produce sharper faces (when GFPGAN enhancement is enabled) but increase computation time.
+### Video
+
+1. **Upscale Factor**  
+   - **Default**: `0.4`.  
+   - Controls the scaling of the output frame before applying face enhancement.  
+   - **Higher values** (e.g., `1.0`) can produce **sharper facial features**—especially when using GFPGAN-but also increase computation time.  
+   - **Lower values** (e.g., `0.4`) reduce inference time with **minimal perceived loss in quality**, making them ideal for real-time applications.  
+   - Note: The original Deep-Live-Cam used a default of `1.0`, but we set `0.4` as a better trade-off between quality and performance.
+  
+2. **Resolution**
+   - **Default**: `(1280, 720)` – HD  
+   - Set in `server.py` under the `process_frame` function:
+     ```python
+     def process_frame(frame, wrapper):
+       frame_resized = cv2.resize(frame, (1280, 720), interpolation=cv2.INTER_AREA)
+       processed_frame = wrapper.generate(frame_resized)
+       return processed_frame
+     ```
+   - Our testing suggests:  
+     - **HD (1280x720)** offers the best balance of **image quality** and **processing time (~0.40s per frame with face enhancement)**.  
+     - **Full HD (1920x1080)** provides **slightly better visual quality**, but slows processing to ~0.70s per frame.  
+     - **Lower resolutions** (e.g., 640x360) **don’t significantly reduce processing time** (~0.30s–0.40s) and degrade quality due to insufficient model input size.
+  
+3. **Face Enhancement Models (GFPGAN)**  
+   - **GFPGANv1.3.pth** (default):  
+     - Optimized for speed  
+     - Delivers good quality for real-time applications  
+   - **GFPGANv1.4.pth**:  
+     - Offers slightly better enhancement, especially around eyes and mouth  
+     - Slightly slower inference time  
+   - **Recommendation**: Use v1.3 for faster, near real-time performance unless highest quality is critical.
+
+4. **Face Swapping Models (InsightFace – inswapper)**  
+   - **inswapper_128_fp16.onnx** (default):  
+     - Faster inference using half-precision (FP16), slightly worse precision
+     - Faster and less memory-intensive
+   - **inswapper_128.onnx** (FP32):  
+     - Higher precision, slightly better results  
+     - Slower and more memory-intensive  
+   - **Recommendation**: Stick with the FP16 model unless you're targeting maximum quality and latency isn't a concern.
+
 
 ---
 
