@@ -291,6 +291,32 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
      - Slower and more memory-intensive  
    - **Recommendation**: Stick with the FP16 model unless you're targeting maximum quality and latency isn't a concern.
 
+---
+
+## Future Improvements 🚀
+
+- **macOS Compatibility:**  
+  - **Manual Workflow:**  
+    - Use the existing non-GUI command-line client for video ([video/client.py](video/client.py)). This client connects with the video server and displays processed frames in an application window.
+    - Users then need to manually start OBS, add the application window as a source, and launch the virtual camera.
+    - The audio part should be integrated into this workflow so that both audio and video can be handled manually via OBS on macOS.
+  - **Automated Workflow:**  
+    - Alternatively, investigate and integrate an alternative to `pyvirtualcam` that works on macOS (especially for M1/M2 devices).  
+    - This would allow the virtual camera to be started automatically, enabling the normal GUI client ([GUI-Client.py](./GUI-Client.py)) to be used without any manual intervention in OBS.
+
+- **Model Enhancements:**  
+  - Integrate and test the new [inswapper-512-live](https://github.com/deepinsight/inswapper-512-live) model, which was announced on March 2, 2025 in the Top News section of [insightface](https://github.com/deepinsight/insightface?tab=readme-ov-file#top-news).
+  - Evaluate and incorporate additional models for both face swapping and face enhancement to further improve quality or speed.
+  - Benchmark overall inference time for the entire pipeline and optimize where possible.
+
+- **General Performance Improvements:**  
+  - Refine audio and video processing pipelines to reduce latency.
+  - Consider integrating more efficient libraries or methods for real-time streaming.
+
+- **User Interface Enhancements:**  
+  - Improve the GUI for better usability and more configuration options.
+  - Provide detailed error messages and logs for troubleshooting.
+
 
 ---
 
