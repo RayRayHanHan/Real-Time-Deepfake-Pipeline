@@ -26,6 +26,9 @@ This repository provides a complete real-time deepfake system for both voice and
 
 Below is a screenshot of the **single GUI** client:
 
+<img src="https://private-user-images.githubusercontent.com/89353884/427791644-c5d941dd-676f-441f-b764-0797082fb7ce.PNG?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDMxMjA5NTQsIm5iZiI6MTc0MzEyMDY1NCwicGF0aCI6Ii84OTM1Mzg4NC80Mjc3OTE2NDQtYzVkOTQxZGQtNjc2Zi00NDFmLWI3NjQtMDc5NzA4MmZiN2NlLlBORz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMjglMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzI4VDAwMTA1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWYyZWU2MzNkOGU1MzgyNTVjNmQwOWFhNGEwYmQ5NWM1NjM3OThjMmMxOWQ5YjgyOTc1OWZmYmZhMjAyMDU1MmMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.Sg_Bx5aAZUASkIHW3GjxOsxEy0lwKlLSbwaoU4lq8CM" alt="GUI_Client" width="600">
+
+
 > **Note:** The pre-trained models are too large for GitHub. Download them manually using the links below and place them into the specified directories.
 
 ---
