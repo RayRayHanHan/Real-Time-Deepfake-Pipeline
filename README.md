@@ -310,8 +310,19 @@ Note: Only the client (e.g. GUI-Client.py) needs to be executed on your local ma
   - Benchmark overall inference time for the entire pipeline and optimize where possible.
 
 - **General Performance Improvements:**  
-  - Refine audio and video processing pipelines to reduce latency.
-  - Consider integrating more efficient libraries or methods for real-time streaming.
+  - **Optimizing Model and Vocoder Loading:**  
+    - Use TorchScript or `torch.compile` to optimize model loading. Implement proper fallbacks if model compilation fails.
+    - Consistently apply Mixed Precision (as already implemented) to reduce memory usage and computation time.
+  - **Improving the Audio Pipeline:**  
+    - Create an asynchronous endpoint (using frameworks such as `Quart` or `FastAPI`) to further reduce waiting times in the Flask server.
+    - Analyze the F0 computation to determine if it can be accelerated further, potentially through vectorization or a GPU-based alternative.
+  - **Threading and Queue Management:**  
+    - Consider optimizing multithreading by dynamically adjusting the number of workers based on current server load.
+    - Expand caching strategies (currently using `lru_cache` and a simple dictionary) to include additional intermediate results for repeated computations.
+  - **Batch Processing:**  
+    - If possible, process multiple audio chunks in batches to reduce the overhead associated with individual function calls.
+  - **Resource and Memory Optimization:**  
+    - Focus on efficient memory management (e.g., explicitly freeing GPU memory after processing) and optimize padding strategies to save both compute power and memory.
 
 - **User Interface Enhancements:**  
   - Improve the GUI for better usability and more configuration options.
